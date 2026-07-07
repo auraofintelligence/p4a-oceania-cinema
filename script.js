@@ -8,7 +8,7 @@ navToggle?.addEventListener('click', () => {
 
 const normalisePath = (value) => {
   const url = new URL(value, location.href);
-  return url.pathname.replace(/\/index\.html$/, '/');
+  return url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 };
 
 const currentPath = normalisePath(location.href);
@@ -126,6 +126,9 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
   if (!cardGrid || !detailPanel) return;
 
   const filterButtons = Array.from(document.querySelectorAll('[data-oceania-choice]'));
+  const searchInput = document.querySelector('[data-atlas-search]');
+  const searchCount = document.querySelector('[data-atlas-count]');
+  let searchQuery = '';
   const svgNS = 'http://www.w3.org/2000/svg';
   const checked = 'Checked 2026-07-03';
 
@@ -171,8 +174,8 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
     tokelau: trace([[393, 193], [430, 193], [452, 211], [441, 238], [403, 238], [388, 217]]),
     hawaii: trace([[438, 0], [486, 0], [541, 8], [562, 31], [542, 47], [485, 43], [442, 25]]),
     americanSamoa: trace([[529, 98], [549, 96], [558, 110], [550, 122], [532, 119]]),
-    guam: trace([[58, 76], [88, 67], [111, 84], [105, 111], [76, 119], [56, 103]]),
-    northernMarianaIslands: trace([[83, 7], [117, 2], [137, 12], [133, 42], [111, 75], [84, 63], [76, 31]])
+    guam: trace([[81, 60], [82, 68], [86, 76], [93, 82], [102, 84], [113, 83], [121, 79], [122, 77]]),
+    northernMarianaIslands: trace([[81, 60], [82, 45], [84, 28], [87, 13], [92, 1], [105, 0], [118, 0], [124, 5], [130, 20], [135, 40], [135, 58], [132, 70], [126, 75], [122, 77]])
   };
 
   mapShapes.australasia = `${mapShapes.australia} ${mapShapes.newZealand}`;
@@ -185,7 +188,7 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
     fiji: 'M 296 233 L 306 220 L 321 222 L 330 234 L 329 246 L 339 250 L 341 260 L 354 263 L 359 274 L 359 297 L 342 319 L 330 320 L 326 314 L 330 299 L 315 295 L 319 313 L 315 325 L 307 328 L 299 321 L 292 298 L 296 284 L 293 274 L 299 259 Z M 342 285 L 335 282 L 333 286 L 337 289 Z',
     kiribati: 'M 269 156 L 279 147 L 283 134 L 295 129 L 302 134 L 316 134 L 323 146 L 332 146 L 340 156 L 342 169 L 332 185 L 298 179 L 290 193 L 278 195 L 268 188 L 261 175 Z M 420 171 L 423 188 L 414 203 L 395 199 L 361 208 L 348 192 L 353 178 L 382 159 L 405 158 Z M 495 110 L 513 123 L 524 142 L 529 180 L 536 186 L 558 187 L 569 203 L 565 220 L 531 250 L 504 241 L 501 230 L 505 215 L 478 199 L 480 184 L 489 177 L 488 167 L 483 154 L 468 147 L 464 134 L 476 114 L 485 109 Z',
     marshallIslands: 'M 246 118 L 248 102 L 238 98 L 234 103 L 217 105 L 191 92 L 195 69 L 208 53 L 233 56 L 262 41 L 276 41 L 306 76 L 311 91 L 310 114 L 299 127 L 283 130 L 279 146 L 265 155 L 246 146 Z',
-    micronesiaFsm: 'M 227 113 L 240 122 L 243 130 L 242 142 L 232 153 L 198 158 L 177 156 L 159 161 L 147 144 L 140 142 L 77 139 L 45 107 L 56 68 L 73 65 L 81 68 L 82 76 L 93 86 L 126 74 L 161 75 L 183 92 Z',
+    micronesiaFsm: 'M 227 113 L 240 122 L 243 130 L 242 142 L 232 153 L 198 158 L 177 156 L 159 161 L 147 144 L 140 142 L 77 139 L 45 107 L 50 90 L 62 84 L 80 83 L 93 86 L 126 74 L 161 75 L 183 92 Z',
     nauru: 'M 263 161 L 253 184 L 241 181 L 226 165 L 226 158 L 237 147 L 260 153 Z',
     newZealand: 'M 341 383 L 356 384 L 351 387 L 361 402 L 356 426 L 372 437 L 386 434 L 394 442 L 394 462 L 385 476 L 357 478 L 354 472 L 343 478 L 331 478 L 329 469 L 311 478 L 264 478 L 254 472 L 246 478 L 225 478 L 217 474 L 215 466 L 221 452 L 235 449 L 252 429 L 260 429 L 279 410 L 279 402 L 265 396 L 261 389 L 271 371 L 280 367 L 305 369 L 313 381 L 320 374 Z M 319 438 L 320 448 L 336 442 L 324 438 L 322 432 L 317 433 Z M 329 351 L 339 336 L 360 331 L 374 350 L 373 368 L 358 382 L 322 374 Z',
     palau: 'M 8 133 L 0 122 L 0 105 L 20 89 L 38 89 L 46 101 L 45 128 L 30 138 Z',
@@ -199,7 +202,8 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
     newCaledonia: 'M 184 308 L 180 299 L 197 271 L 206 264 L 225 266 L 236 272 L 244 286 L 292 306 L 298 317 L 298 330 L 292 339 L 277 341 L 265 331 L 239 326 L 232 330 L 209 329 L 192 321 Z',
     wallisFutuna: 'M 366 226 L 374 228 L 374 248 L 355 260 L 342 259 L 340 246 L 354 238 L 356 228 Z',
     hawaii: 'M 464 31 L 452 33 L 439 26 L 427 29 L 375 20 L 365 13 L 365 4 L 367 0 L 472 0 L 476 5 L 478 1 L 507 0 L 513 14 L 522 14 L 531 24 L 530 36 L 524 44 L 502 57 L 493 57 L 475 48 L 473 35 L 479 29 Z',
-    northernMarianaIslands: 'M 81 61 L 82 55 L 96 57 L 85 54 L 83 44 L 88 9 L 99 1 L 121 5 L 130 16 L 135 33 L 134 64 L 126 69 L 104 61 L 125 72 L 93 86 L 81 74 Z'
+    guam: 'M 81 60 L 82 68 L 86 76 L 93 82 L 102 84 L 113 83 L 121 79 L 122 77 Z',
+    northernMarianaIslands: 'M 81 60 L 82 45 L 84 28 L 87 13 L 92 1 L 105 0 L 118 0 L 124 5 L 130 20 L 135 40 L 135 58 L 132 70 L 126 75 L 122 77 Z'
   };
 
   Object.assign(mapShapes, blobShapes);
@@ -410,26 +414,45 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
     filterKind !== 'all' && Boolean(area.shape) && matchesFilter(area, filterKind)
   );
 
+  const matchesSearch = (area) => (
+    !searchQuery || `${area.name} ${area.tag} ${area.status} ${area.summary}`.toLowerCase().includes(searchQuery)
+  );
+
+  let activeKind = 'all';
   const setFilter = (kind) => {
+    activeKind = kind;
     filterButtons.forEach((button) => {
       const active = button.getAttribute('data-oceania-choice') === kind;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
 
+    let visibleCount = 0;
     cards.forEach((card) => {
       const area = areaById.get(card.getAttribute('data-oceania-card'));
-      const visible = Boolean(area && matchesFilter(area, kind));
+      const visible = Boolean(area && matchesFilter(area, kind) && matchesSearch(area));
       card.hidden = !visible;
+      if (visible) visibleCount += 1;
     });
 
     hitLinks.forEach((link) => {
       const area = areaById.get(link.getAttribute('data-oceania-map-area'));
-      const visible = Boolean(area && matchesMapLayer(area, kind));
+      const visible = Boolean(area && matchesMapLayer(area, kind) && matchesSearch(area));
       link.classList.toggle('is-hidden', !visible);
       link.setAttribute('aria-hidden', String(!visible));
     });
+
+    if (searchCount) {
+      searchCount.textContent = visibleCount === cards.length
+        ? `${cards.length} atlas cards`
+        : `${visibleCount} of ${cards.length} atlas cards match`;
+    }
   };
+
+  searchInput?.addEventListener('input', () => {
+    searchQuery = (searchInput.value || '').trim().toLowerCase();
+    setFilter(activeKind);
+  });
 
   const setActive = (slug, options = {}) => {
     const area = areaById.get(slug);
@@ -473,4 +496,197 @@ document.querySelectorAll('[data-region-switcher]').forEach((switcher) => {
   const initial = requestedArea?.id || 'australia';
   setFilter(initialFilter);
   setActive(initial);
+})();
+
+
+/* Oceania pulse board: live election clocks driven by assets/oceania-pulse-data.js */
+(() => {
+  const board = document.querySelector('[data-pulse-board]');
+  const data = window.OCEANIA_PULSE;
+  if (!board || !data) return;
+
+  const countEl = document.querySelector('[data-pulse-count]');
+  const sortSelect = document.querySelector('[data-pulse-sort]');
+  const filterButtons = Array.from(document.querySelectorAll('[data-pulse-filter]'));
+  const blocNames = {
+    australasia: 'Australasia',
+    melanesia: 'Melanesia',
+    micronesia: 'Micronesia',
+    polynesia: 'Polynesia',
+    territories: 'Territories'
+  };
+  const dayMs = 86400000;
+  const two = (value) => String(value).padStart(2, '0');
+  let filter = 'all';
+
+  /* A term-length projection (lastElection + termYears), never a real announced
+     date. Only computed where termYears is set — which the data file reserves
+     for well-known fixed cycles with followup:false. */
+  const getProjection = (entry) => {
+    if (!entry.lastElection || !entry.termYears) return null;
+    const next = new Date(`${entry.lastElection}T00:00:00`);
+    next.setFullYear(next.getFullYear() + entry.termYears);
+    return next.getTime();
+  };
+
+  const rows = data.entries.map((entry) => {
+    const card = document.createElement('article');
+    card.className = 'pulse-card';
+    card.id = `pulse-${entry.id}`;
+    card.setAttribute('data-pulse-bloc', entry.bloc);
+    if (entry.followup) card.setAttribute('data-pulse-followup', 'true');
+
+    const top = document.createElement('div');
+    top.className = 'pulse-topline';
+    const bloc = document.createElement('span');
+    bloc.className = 'pulse-bloc';
+    bloc.textContent = blocNames[entry.bloc] || entry.bloc;
+    top.appendChild(bloc);
+    if (entry.followup) {
+      const flag = document.createElement('span');
+      flag.className = 'pulse-flag';
+      flag.textContent = 'Needs follow-up';
+      top.appendChild(flag);
+    }
+
+    const title = document.createElement('h3');
+    title.textContent = entry.name;
+
+    const projection = getProjection(entry);
+    const clockWrap = document.createElement('div');
+
+    if (projection) {
+      /* Projected next election is the headline: primary, prominent clock. */
+      clockWrap.className = 'pulse-clock-wrap';
+      const clock = document.createElement('strong');
+      clock.className = 'pulse-clock pulse-clock-countdown';
+      clock.setAttribute('data-pulse-countdown', String(projection));
+      clock.textContent = '—';
+      const clockLabel = document.createElement('span');
+      clockLabel.textContent = `projected to the next election window (${entry.termYears}-year term estimate)`;
+      clockWrap.append(clock, clockLabel);
+
+      const since = document.createElement('p');
+      since.className = 'pulse-since-secondary';
+      const sinceValue = document.createElement('span');
+      sinceValue.setAttribute('data-pulse-clock', entry.lastElection);
+      sinceValue.textContent = '—';
+      since.append(sinceValue, document.createTextNode(` since the last ${entry.lastLabel.toLowerCase()}`));
+      card.append(top, title, clockWrap, since);
+    } else if (entry.lastElection) {
+      /* No safe projection: days-since stays the primary, honest fact. */
+      clockWrap.className = 'pulse-clock-wrap';
+      const clock = document.createElement('strong');
+      clock.className = 'pulse-clock';
+      clock.setAttribute('data-pulse-clock', entry.lastElection);
+      clock.textContent = '—';
+      const clockLabel = document.createElement('span');
+      clockLabel.textContent = `since the last ${entry.lastLabel.toLowerCase()}`;
+      clockWrap.append(clock, clockLabel);
+
+      const due = document.createElement('p');
+      due.className = 'pulse-due';
+      due.textContent = entry.dueWindow;
+      card.append(top, title, clockWrap, due);
+    } else {
+      clockWrap.className = 'pulse-clock-wrap';
+      const clockLabel = document.createElement('span');
+      clockLabel.className = 'pulse-noclock';
+      clockLabel.textContent = entry.lastLabel;
+      clockWrap.appendChild(clockLabel);
+
+      const due = document.createElement('p');
+      due.className = 'pulse-due';
+      due.textContent = entry.dueWindow;
+      card.append(top, title, clockWrap, due);
+    }
+
+    const system = document.createElement('p');
+    system.className = 'pulse-system';
+    system.textContent = entry.system;
+
+    const note = document.createElement('p');
+    note.className = 'pulse-note';
+    note.textContent = entry.note;
+
+    card.append(system, note);
+    return { entry, card, projection };
+  });
+  rows.forEach((row) => board.appendChild(row.card));
+
+  const stamp = (entry) => (entry.lastElection ? new Date(`${entry.lastElection}T00:00:00`).getTime() : 0);
+  const sorters = {
+    recent: (a, b) => stamp(b.entry) - stamp(a.entry) || a.entry.name.localeCompare(b.entry.name),
+    longest: (a, b) => {
+      const aHas = stamp(a.entry) ? 0 : 1;
+      const bHas = stamp(b.entry) ? 0 : 1;
+      return aHas - bHas || stamp(a.entry) - stamp(b.entry) || a.entry.name.localeCompare(b.entry.name);
+    },
+    soonest: (a, b) => {
+      const aHas = a.projection ? 0 : 1;
+      const bHas = b.projection ? 0 : 1;
+      return aHas - bHas || (a.projection || 0) - (b.projection || 0) || a.entry.name.localeCompare(b.entry.name);
+    },
+    name: (a, b) => a.entry.name.localeCompare(b.entry.name)
+  };
+
+  const applyView = () => {
+    const sortMode = sortSelect?.value || 'recent';
+    rows.sort(sorters[sortMode] || sorters.recent).forEach((row) => board.appendChild(row.card));
+
+    let visible = 0;
+    rows.forEach((row) => {
+      const show = filter === 'all'
+        || (filter === 'followup' && row.entry.followup)
+        || row.entry.bloc === filter;
+      row.card.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (countEl) {
+      countEl.textContent = visible === rows.length
+        ? `${rows.length} clocks on the board · research run ${data.researchRun}`
+        : `${visible} of ${rows.length} clocks shown · research run ${data.researchRun}`;
+    }
+  };
+
+  filterButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      filter = button.getAttribute('data-pulse-filter') || 'all';
+      filterButtons.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      applyView();
+    });
+  });
+  sortSelect?.addEventListener('change', applyView);
+
+  const formatSpan = (ms) => {
+    const days = Math.floor(ms / dayMs);
+    const hours = Math.floor((ms % dayMs) / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${days.toLocaleString('en-AU')}d ${two(hours)}h ${two(minutes)}m ${two(seconds)}s`;
+  };
+
+  const countUpClocks = Array.from(board.querySelectorAll('[data-pulse-clock]'));
+  const countdownClocks = Array.from(board.querySelectorAll('[data-pulse-countdown]'));
+  const tick = () => {
+    const now = Date.now();
+    countUpClocks.forEach((clock) => {
+      const then = new Date(`${clock.getAttribute('data-pulse-clock')}T00:00:00`).getTime();
+      if (Number.isNaN(then)) { clock.textContent = 'Date needs checking'; return; }
+      clock.textContent = formatSpan(Math.max(0, now - then));
+    });
+    countdownClocks.forEach((clock) => {
+      const target = Number(clock.getAttribute('data-pulse-countdown'));
+      const diff = target - now;
+      clock.textContent = diff > 0 ? formatSpan(diff) : `Window open · ${formatSpan(Math.abs(diff))} past estimate`;
+      clock.classList.toggle('is-past-estimate', diff <= 0);
+    });
+  };
+  tick();
+  setInterval(tick, 1000);
+  applyView();
 })();
