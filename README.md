@@ -86,3 +86,11 @@ Open civic prototype. Legal, electoral, financial, medical, procurement, infrast
 - [Original Oceania expansion lab](https://auraofintelligence.github.io/p4a-oceania-expansion-lab/)
 - [P4A cinematic presentation](https://auraofintelligence.github.io/p4a-xyz-cinema/)
 - [Native Nations Sovereign Co-Evolution Lab](https://auraofintelligence.github.io/p4a-native-nations-cinema/)
+
+
+<!-- mutual-futures-connection -->
+## Mutual Futures: connected workbench
+
+[Mutual Futures](https://auraofintelligence.github.io/mutual-futures/) connects this project with Luke Nathan Hayes's proposed mutual business succession, Try Everything Once, Intermittent Retirement, personal intelligence, legal reflection, resilience, travel and wider civilisational horizon. The connection does not merge the projects or imply outside endorsement.
+
+[Source repository](https://github.com/auraofintelligence/mutual-futures) · [Project connections and sources](https://auraofintelligence.github.io/mutual-futures/sources.html)
